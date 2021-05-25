@@ -21,12 +21,13 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
     
     const startInterval = (): void => {
         const timeOutCallback = (): void => {
-            if (isLoopPlaying) {
+            // if (isLoopPlaying) {
                 console.log('Interval ended!');
                 console.log(allInstrumentsStates);
                 playOrPauseInstruments(true);
                 startInterval();
-            };
+                debugger;
+            // };
         };
         const intervalMiliseconds = 8000;
         console.log('Started Interval!');
@@ -37,8 +38,13 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
      * @param play - if set to true it starts to play, if false it will stop the Loop.
      */
     const playOrPauseLoop = (play: boolean): void => {
+        setIsLoopPlaying(previousState=>{
+            console.log(previousState);
+            const newState = true;
+            console.log(newState);
+            return newState;
+        });
         console.log('Play Loop Func: ' + allInstrumentsStates);
-        setIsLoopPlaying(play);
         playOrPauseInstruments(play);
         if (play) {
             startInterval();

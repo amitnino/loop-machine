@@ -1,5 +1,5 @@
-### Crazy Loops!
+# Crazy Loops!
 
-# Init steps:
+### Init steps:
     1. npm i
     2. npm start
