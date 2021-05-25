@@ -1,21 +1,26 @@
 import React from 'react';
+import { useLoopStateContext } from './../providers/LoopStateProvider';
 
 type PadProps = {
-    soundTitle: string | null,
+    sound: HTMLAudioElement,
     instrumentIndex: number,
-    allInstrumentsStates: boolean[],
-    toggleInstrument: (instrumentIndex: number) => void
 }
 
-const Pad: React.FunctionComponent<PadProps> = ({ soundTitle, instrumentIndex, allInstrumentsStates, toggleInstrument }: PadProps) => {
+const Pad: React.FunctionComponent<PadProps> = ({ sound, instrumentIndex }: PadProps) => {
+
+    const loopStateContext = useLoopStateContext();
+
+    const parseSoundNameFromSrc = (soundSrc: string): string => {
+        return soundSrc.split('/')[4].split('.')[0].toUpperCase();
+    }
 
     return (
         <div className="pad">
-            <p>{soundTitle && soundTitle}</p>
+            <p>{parseSoundNameFromSrc(sound.src)}</p>
             <button
-                onClick={() => { toggleInstrument(instrumentIndex) }}
+                onClick={() => { loopStateContext?.toggleSingleInstrumentStateByIndex(instrumentIndex) }}
             >
-                {allInstrumentsStates[instrumentIndex] ? 'Pause' : 'Play' }
+                {loopStateContext?.allInstrumentsStates[instrumentIndex] ? 'Pause' : 'Play' }
             </button>
         </div>
     )

@@ -1,19 +1,18 @@
 import React from 'react';
+import { useLoopStateContext } from './../providers/LoopStateProvider';
 
-type ButtonsProps = {
-    playOrPauseLoop: (play: boolean)=>void,
-    isLoopPlaying: boolean,
-}
+type ButtonsProps = {}
 
-const Buttons: React.FunctionComponent<ButtonsProps> = ({
-    playOrPauseLoop, isLoopPlaying
-}) => {
+const Buttons: React.FunctionComponent<ButtonsProps> = () => {
+
+    const loopStateContext = useLoopStateContext();
+
     return (
         <div>
             <button
-                onClick={() => {playOrPauseLoop(!isLoopPlaying)}}
+                onClick={() => {loopStateContext?.playOrPauseLoop(!loopStateContext?.isLoopPlaying)}}
             >
-                {isLoopPlaying ? 'Pause' : 'Play'}
+                {loopStateContext?.isLoopPlaying ? 'Pause' : 'Play'}
             </button>
         </div>
     )
