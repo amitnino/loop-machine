@@ -1,4 +1,3 @@
-import './App.css';
 import Heading from './components/Heading';
 import { sounds } from './utils/sounds';
 import Pad from './components/Pad';

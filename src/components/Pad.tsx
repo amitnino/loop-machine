@@ -16,12 +16,14 @@ const Pad: React.FunctionComponent<PadProps> = ({ sound, instrumentIndex }: PadP
 
     return (
         <div className="pad">
+            <div className="pad-content">
             <p>{parseSoundNameFromSrc(sound.src)}</p>
             <button
                 onClick={() => { loopStateContext?.toggleSingleInstrumentStateByIndex(instrumentIndex) }}
             >
                 {loopStateContext?.allInstrumentsStates[instrumentIndex] ? 'Pause' : 'Play' }
             </button>
+            </div>
         </div>
     )
 }
