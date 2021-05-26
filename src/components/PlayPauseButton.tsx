@@ -1,5 +1,5 @@
 import './PlayPauseButton.css';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FaPlayCircle, FaPauseCircle} from 'react-icons/fa';
 
 type PlayPauseButtonProps = {
