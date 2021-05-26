@@ -1,0 +1,41 @@
+.pad {
+  position: relative;
+  border: 1px solid black;
+  min-width: 115px;
+  width: 33.333%;
+  padding-top: 33.3333%;
+  /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.582) inset; */
+  -webkit-box-shadow: 0px 0px 51px -3px rgba(0, 0, 0, 0.52) inset;
+  -moz-shadow: 0px 0px 51px -3px rgba(0, 0, 0, 0.52) inset;
+  box-shadow: 0px 0px 51px -3px rgba(0, 0, 0, 0.52) inset;
+}
+
+.pad-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.pad-not-active{
+  background-color: darkslategrey;
+}
+.pad-color-0 {
+  background-color: #3150F6;
+}
+.pad-color-1 {
+  background-color: #2A71D4;
+}
+.pad-color-2 {
+  background-color: #3BB4EA;
+}
+.pad-color-3 {
+  background-color: #2ACBD4;
+}
+.pad-color-4 {
+  background-color: #31F6CA;
+}

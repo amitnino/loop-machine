@@ -21,23 +21,11 @@ const LoopStateContext = createContext<LoopStateContextType | null>(null);
 export const useLoopStateContext = () => useContext(LoopStateContext);
 
 export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
-    
+
     const [isLoopPlaying, setIsLoopPlaying] = useState<boolean>(false);
     const [allInstrumentsStates, setAllInstrumentsStates] = useState<boolean[]>([false, false, false, false, false, false, false, false, false]);
     const [delay, setDelay] = useState<number | null>(null);
-    
-    /**
-     * @param play - if set to true it starts to play, if false it will stop the Loop.
-     */
-    const playOrPauseLoop = (play: boolean): void => {
-        setIsLoopPlaying(play);
-        playOrPauseInstruments(play);
-        if (play) {
-            startInterval();
-        } else {
-            setDelay(null);
-        };
-    };
+
     /**
      * @returns An array of the active instrument's indexes.
      */
@@ -65,7 +53,7 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
     /**
      * Toggles the state of a single instrument boolean state in allInstrumentsStates array.
      * @param instrumentIndex;
-    */
+     */
     const toggleSingleInstrumentStateByIndex = (instrumentIndex: number): void => {
         allInstrumentsStates[instrumentIndex] = !allInstrumentsStates[instrumentIndex];
         setAllInstrumentsStates(new Array(...allInstrumentsStates));
@@ -77,10 +65,11 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
         if (allInstrumentsStates[instrumentIndex] && !isLoopPlaying) {
             playOrPauseLoop(true);
         };
-    };
-    
-    const startInterval = (): void => {
-        setDelay(timeOutDelay);
+        // if the new instrument state is false and all other instruments are false, stop playing loop.
+        const activeInstruments: number[] = getCurrentActiveInstrumentsIndex();
+        if (!allInstrumentsStates[instrumentIndex] && !activeInstruments.length){
+            playOrPauseLoop(false);
+        };
     };
     /**
      * Executes at the end of a timeOut interval.
@@ -88,12 +77,28 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
     const timeOutCallback = (): void => {
         if (isLoopPlaying) {
             playOrPauseInstruments(true);
-            setDelay(timeOutDelay);
-        }else{
+            startTimeout();
+        } else {
             setDelay(null);
         };
     };
     // Instance of the timeout being run recursivly
+    const startTimeout = (): void => {
+        setDelay(null);
+        setDelay(timeOutDelay);
+    }
+    /**
+     * @param play - if set to true it starts to play, if false it will stop the Loop.
+     */
+    const playOrPauseLoop = (play: boolean): void => {
+        setIsLoopPlaying(play);
+        playOrPauseInstruments(play);
+        if (play) {
+            startTimeout();
+        } else {
+            setDelay(null);
+        };
+    };
     useTimeout(timeOutCallback, delay);
 
     return (

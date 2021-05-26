@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLoopStateContext } from './../providers/LoopStateProvider';
+import PlayPauseButton from './PlayPauseButton';
 
 type ButtonsProps = {}
 
@@ -9,11 +10,7 @@ const Buttons: React.FunctionComponent<ButtonsProps> = () => {
 
     return (
         <div>
-            <button
-                onClick={() => {loopStateContext?.playOrPauseLoop(!loopStateContext?.isLoopPlaying)}}
-            >
-                {loopStateContext?.isLoopPlaying ? 'Pause' : 'Play'}
-            </button>
+            <PlayPauseButton key={1} onClickCallback={() => {loopStateContext?.playOrPauseLoop(!loopStateContext?.isLoopPlaying)}} state={loopStateContext?.isLoopPlaying!} >Button</PlayPauseButton>
         </div>
     )
 }

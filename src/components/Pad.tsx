@@ -1,5 +1,7 @@
-import React from 'react';
+import './Pad.css';
+import React, { useEffect, useState } from 'react';
 import { useLoopStateContext } from './../providers/LoopStateProvider';
+import PlayPauseButton from './PlayPauseButton';
 
 type PadProps = {
     sound: HTMLAudioElement,
@@ -10,19 +12,27 @@ const Pad: React.FunctionComponent<PadProps> = ({ sound, instrumentIndex }: PadP
 
     const loopStateContext = useLoopStateContext();
 
+    const [padStyleColor, setPadStyleColor] = useState<string>('pad-not-active')
+
     const parseSoundNameFromSrc = (soundSrc: string): string => {
-        return soundSrc.split('/')[4].split('.')[0].toUpperCase();
+        return soundSrc.split('/')[5].split('.')[0].toUpperCase();
     }
 
+
+
+    useEffect(() => {
+        const newStyleColor: string = loopStateContext?.allInstrumentsStates[instrumentIndex] ? `pad-color-${Math.floor(Math.random()*5)}` : 'pad-not-active';
+        setPadStyleColor(newStyleColor);
+    }, [loopStateContext?.allInstrumentsStates[instrumentIndex], instrumentIndex])
+
     return (
-        <div className="pad">
+        <div className={`pad ${padStyleColor}`} >
             <div className="pad-content">
             <p>{parseSoundNameFromSrc(sound.src)}</p>
-            <button
-                onClick={() => { loopStateContext?.toggleSingleInstrumentStateByIndex(instrumentIndex) }}
-            >
-                {loopStateContext?.allInstrumentsStates[instrumentIndex] ? 'Pause' : 'Play' }
-            </button>
+            <PlayPauseButton
+            onClickCallback={() => { loopStateContext?.toggleSingleInstrumentStateByIndex(instrumentIndex)}}
+            state={loopStateContext?.allInstrumentsStates[instrumentIndex]!}
+            ></PlayPauseButton>
             </div>
         </div>
     )

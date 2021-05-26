@@ -1,3 +1,4 @@
+import './App.css';
 import Heading from './components/Heading';
 import { sounds } from './utils/sounds';
 import Pad from './components/Pad';
@@ -7,8 +8,7 @@ function App() {
 
   return (
     <div className="App">
-      <audio src=""></audio>
-      <Heading></Heading>
+      <Heading>CRAZY LOOPS</Heading>
       <Buttons></Buttons>
       <div className="pads-container">
         {
