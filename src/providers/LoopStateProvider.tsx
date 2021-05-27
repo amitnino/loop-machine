@@ -1,7 +1,7 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useRef, useState } from "react"
 import type { ReactNode } from 'react';
 import { sounds } from "../utils/sounds";
-import useLooper from "../hooks/useLooper";
+import useInterval from "../hooks/useInterval";
 
 export type LoopStateContextType = {
     isLoopPlaying: boolean,
@@ -15,10 +15,29 @@ const LoopStateContext = createContext<LoopStateContextType | null>(null);
 export const useLoopStateContext = () => useContext(LoopStateContext);
 
 export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
-     
     const [allInstrumentsStates, setAllInstrumentsStates] = useState<boolean[]>([false, false, false, false, false, false, false, false, false]);
     const [isLoopPlaying, setIsLoopPlaying] = useState<boolean>(false);
-       
+    /**
+     * Toggles the state of a single instrument boolean state in allInstrumentsStates array.
+     * @param instrumentIndex;
+     */
+    const toggleSingleInstrumentStateByIndex = (instrumentIndex: number): void => {
+        allInstrumentsStates[instrumentIndex] = !allInstrumentsStates[instrumentIndex];
+        setAllInstrumentsStates(new Array(...allInstrumentsStates));
+        // if the new instrument state is false, stop playing instrument immidietly
+        if (!allInstrumentsStates[instrumentIndex]) {
+            sounds[instrumentIndex].pause();
+        };
+        // if the new instrument state is true and loop is not playing, start playing loop.
+        if (allInstrumentsStates[instrumentIndex] && !isLoopPlaying) {
+            setIsLoopPlaying(true);
+        };
+        // if the new instrument state is false and all other instruments are false, stop playing loop.
+        const activeInstruments: number[] = getCurrentActiveInstrumentsIndex();
+        if (!allInstrumentsStates[instrumentIndex] && !activeInstruments.length) {
+            setIsLoopPlaying(false);
+        };
+    };
     /**
      * @returns An array of the active instrument's indexes.
      */
@@ -43,33 +62,18 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
             };
         };
     };
-    /**
-     * Toggles the state of a single instrument boolean state in allInstrumentsStates array.
-     * @param instrumentIndex;
-     */
-    const toggleSingleInstrumentStateByIndex = (instrumentIndex: number): void => {
-        allInstrumentsStates[instrumentIndex] = !allInstrumentsStates[instrumentIndex];
-        setAllInstrumentsStates(new Array(...allInstrumentsStates));
-        // if the new instrument state is false, stop playing instrument immidietly
-        if (!allInstrumentsStates[instrumentIndex]) {
-            sounds[instrumentIndex].pause();
-        };
-        // if the new instrument state is true and loop is not playing, start playing loop.
-        if (allInstrumentsStates[instrumentIndex] && !isLoopPlaying) {
-            setIsLoopPlaying(true);
-        };
-        // if the new instrument state is false and all other instruments are false, stop playing loop.
-        const activeInstruments: number[] = getCurrentActiveInstrumentsIndex();
-        if (!allInstrumentsStates[instrumentIndex] && !activeInstruments.length){
-            setIsLoopPlaying(false);
-        };
+    // Listen to loop playing state.
+    const savedPlayOrPauseInstruments = useRef<(play: boolean) => void>(playOrPauseInstruments);
+    useEffect(() => {
+        savedPlayOrPauseInstruments.current(isLoopPlaying);
+    }, [isLoopPlaying]);
+
+    const timeOutDelay: number = 8000;
+    const timeIntervalCallback = () => {
+        playOrPauseInstruments(isLoopPlaying);
     };
+    useInterval({callback:timeIntervalCallback, delay: isLoopPlaying ? timeOutDelay : null});
 
-
-    const timeIntervalCallback = () => {};
-    useLooper({isLoopPlaying, playOrPauseInstruments, timeIntervalCallback});
-
-    
     return (
         <LoopStateContext.Provider value={{ isLoopPlaying, setIsLoopPlaying, allInstrumentsStates, setAllInstrumentsStates, toggleSingleInstrumentStateByIndex }}>
             {children}
