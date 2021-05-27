@@ -10,7 +10,7 @@ const Buttons: React.FunctionComponent<ButtonsProps> = () => {
 
     return (
         <div>
-            <PlayPauseButton key={1} onClickCallback={() => {loopStateContext?.playOrPauseLoop(!loopStateContext?.isLoopPlaying)}} state={loopStateContext?.isLoopPlaying!} >Button</PlayPauseButton>
+            <PlayPauseButton key={1} onClickCallback={() => {loopStateContext?.setIsLoopPlaying(!loopStateContext?.isLoopPlaying)}} state={loopStateContext?.isLoopPlaying!} >Button</PlayPauseButton>
         </div>
     )
 }

@@ -11,18 +11,19 @@ type PadProps = {
 const Pad: React.FunctionComponent<PadProps> = ({ sound, instrumentIndex }: PadProps) => {
 
     const loopStateContext = useLoopStateContext();
-
+    
     const [padStyleColor, setPadStyleColor] = useState<string>('pad-not-active')
-
+    
     const parseSoundNameFromSrc = (soundSrc: string): string => {
         return soundSrc.split('/')[5].split('.')[0].toUpperCase();
     }
-
-
-
+    
+    
+    
     useEffect(() => {
         const newStyleColor: string = loopStateContext?.allInstrumentsStates[instrumentIndex] ? `pad-color-${Math.floor(Math.random()*5)}` : 'pad-not-active';
         setPadStyleColor(newStyleColor);
+        // eslint-disable-next-line
     }, [loopStateContext?.allInstrumentsStates[instrumentIndex], instrumentIndex])
 
     return (

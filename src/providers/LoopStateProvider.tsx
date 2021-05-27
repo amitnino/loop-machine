@@ -1,31 +1,24 @@
 import { createContext, useContext, useState } from "react"
 import type { ReactNode } from 'react';
 import { sounds } from "../utils/sounds";
-import useTimeout from "../hooks/useTimeout";
+import useLooper from "../hooks/useLooper";
 
 export type LoopStateContextType = {
     isLoopPlaying: boolean,
     setIsLoopPlaying: (newState: boolean) => void,
     allInstrumentsStates: boolean[],
     setAllInstrumentsStates: (newState: boolean[]) => void,
-    playOrPauseLoop: (play: boolean) => void,
     toggleSingleInstrumentStateByIndex: (instrumentIndex: number) => void
 };
-
-/**
- * The amount of miliseconds set in the timeout
- */
-const timeOutDelay: number = 8000;
 
 const LoopStateContext = createContext<LoopStateContextType | null>(null);
 export const useLoopStateContext = () => useContext(LoopStateContext);
 
 export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
-
-    const [isLoopPlaying, setIsLoopPlaying] = useState<boolean>(false);
+     
     const [allInstrumentsStates, setAllInstrumentsStates] = useState<boolean[]>([false, false, false, false, false, false, false, false, false]);
-    const [delay, setDelay] = useState<number | null>(null);
-
+    const [isLoopPlaying, setIsLoopPlaying] = useState<boolean>(false);
+       
     /**
      * @returns An array of the active instrument's indexes.
      */
@@ -63,46 +56,22 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
         };
         // if the new instrument state is true and loop is not playing, start playing loop.
         if (allInstrumentsStates[instrumentIndex] && !isLoopPlaying) {
-            playOrPauseLoop(true);
+            setIsLoopPlaying(true);
         };
         // if the new instrument state is false and all other instruments are false, stop playing loop.
         const activeInstruments: number[] = getCurrentActiveInstrumentsIndex();
         if (!allInstrumentsStates[instrumentIndex] && !activeInstruments.length){
-            playOrPauseLoop(false);
+            setIsLoopPlaying(false);
         };
     };
-    /**
-     * Executes at the end of a timeOut interval.
-     */
-    const timeOutCallback = (): void => {
-        if (isLoopPlaying) {
-            playOrPauseInstruments(true);
-            startTimeout();
-        } else {
-            setDelay(null);
-        };
-    };
-    // Instance of the timeout being run recursivly
-    const startTimeout = (): void => {
-        setDelay(null);
-        setDelay(timeOutDelay);
-    }
-    /**
-     * @param play - if set to true it starts to play, if false it will stop the Loop.
-     */
-    const playOrPauseLoop = (play: boolean): void => {
-        setIsLoopPlaying(play);
-        playOrPauseInstruments(play);
-        if (play) {
-            startTimeout();
-        } else {
-            setDelay(null);
-        };
-    };
-    useTimeout(timeOutCallback, delay);
 
+
+    const timeIntervalCallback = () => {};
+    useLooper({isLoopPlaying, playOrPauseInstruments, timeIntervalCallback});
+
+    
     return (
-        <LoopStateContext.Provider value={{ isLoopPlaying, setIsLoopPlaying, allInstrumentsStates, setAllInstrumentsStates, toggleSingleInstrumentStateByIndex, playOrPauseLoop }}>
+        <LoopStateContext.Provider value={{ isLoopPlaying, setIsLoopPlaying, allInstrumentsStates, setAllInstrumentsStates, toggleSingleInstrumentStateByIndex }}>
             {children}
         </LoopStateContext.Provider>
     )
