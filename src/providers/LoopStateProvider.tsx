@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react"
+import { createContext, useContext, useState } from "react"
 import type { ReactNode } from 'react';
 import { sounds } from "../utils/sounds";
-import useInterval from "../hooks/useInterval";
 
 export type LoopStateContextType = {
     isLoopPlaying: boolean,
@@ -33,46 +32,11 @@ export const LoopStateProvider = ({ children }: { children: ReactNode }) => {
             setIsLoopPlaying(true);
         };
         // if the new instrument state is false and all other instruments are false, stop playing loop.
-        const activeInstruments: number[] = getCurrentActiveInstrumentsIndex();
+        const activeInstruments: number[] = allInstrumentsStates.flatMap((instrument: boolean, index: number) => instrument ? index : []);
         if (!allInstrumentsStates[instrumentIndex] && !activeInstruments.length) {
             setIsLoopPlaying(false);
         };
     };
-    /**
-     * @returns An array of the active instrument's indexes.
-     */
-    const getCurrentActiveInstrumentsIndex = (): number[] => {
-        return allInstrumentsStates.flatMap((instrument: boolean, index: number) => instrument ? index : []);
-    };
-    /**
-     * @param play - if set to true it starts to play, if false it will pause all instruments.
-     */
-    const playOrPauseInstruments = (play: boolean): void => {
-        // check which of the instruments is set to true.
-        const activeInstrumentsIndex: number[] = getCurrentActiveInstrumentsIndex();
-        // play / pause the audio of these instruments
-        if (play) {
-            for (let instrumentIndex of activeInstrumentsIndex) {
-                sounds[instrumentIndex].currentTime = 0;
-                sounds[instrumentIndex].play();
-            };
-        } else {
-            for (let sound of sounds) {
-                sound.pause();
-            };
-        };
-    };
-    // Listen to loop playing state.
-    const savedPlayOrPauseInstruments = useRef<(play: boolean) => void>(playOrPauseInstruments);
-    useEffect(() => {
-        savedPlayOrPauseInstruments.current(isLoopPlaying);
-    }, [isLoopPlaying]);
-
-    const timeOutDelay: number = 8000;
-    const timeIntervalCallback = () => {
-        playOrPauseInstruments(isLoopPlaying);
-    };
-    useInterval({callback:timeIntervalCallback, delay: isLoopPlaying ? timeOutDelay : null});
 
     return (
         <LoopStateContext.Provider value={{ isLoopPlaying, setIsLoopPlaying, allInstrumentsStates, setAllInstrumentsStates, toggleSingleInstrumentStateByIndex }}>

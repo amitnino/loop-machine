@@ -11,9 +11,9 @@ export const useRecordSessionContext = () => useContext(RecordSessionContext);
 
 export const RecordSessionProvider = ({ children }: { children: ReactNode }) => {
     
+    const loopStateContext = useLoopStateContext();
     const [roundCounter, setRoundCounter] = useState(0);
 
-    const loopStateContext = useLoopStateContext();
 
     const startRecording = ()=>{
         loopStateContext?.setIsLoopPlaying(true);
