@@ -1,27 +1,27 @@
-import { useEffect, useRef } from "react";
+import { MutableRefObject, useCallback, useEffect, useRef } from "react";
 import { sounds } from "../utils/sounds";
 import useInterval from "./useInterval";
-
 
 type usePlayLoopProps = {
     isLoopPlaying: boolean,
     allInstrumentsStates: boolean[],
-    callback?: ()=>void,
+    isRecording: boolean,
+    roundCounter: MutableRefObject<number>,
 };
 
-const usePlayLoop = ({isLoopPlaying, allInstrumentsStates, callback}: usePlayLoopProps) => {
+const usePlayLoop = ({isLoopPlaying, allInstrumentsStates, isRecording, roundCounter}: usePlayLoopProps) => {
     
-    const timeIntervalCallback = ( ) => {
-        if(callback){
-            callback();
+    const timeIntervalCallback = useCallback(( ) => {
+        if(isRecording && isLoopPlaying){
+            roundCounter.current += 1;
         };
         savedPlayOrPauseInstruments.current(isLoopPlaying);
-    }
-    const savedTimeIntervalCallback = useRef<()=>void | null>(timeIntervalCallback);
+    }, [isRecording, isLoopPlaying, roundCounter]);
+
     /**
      * @param play - if set to true it starts to play, if false it will pause all instruments.
      */
-    const playOrPauseInstruments = (play: boolean): void => {
+    const playOrPauseInstruments = useCallback((play: boolean): void => {
         // check which of the instruments is set to true.
         const activeInstrumentsIndex: number[] = allInstrumentsStates.flatMap((instrument: boolean, index: number) => instrument ? index : []);
         // play / pause the audio of these instruments
@@ -35,20 +35,19 @@ const usePlayLoop = ({isLoopPlaying, allInstrumentsStates, callback}: usePlayLoo
                 sound.pause();
             };
         };
-    };
+    }, [allInstrumentsStates]);
     const savedPlayOrPauseInstruments = useRef<(play: boolean) => void>(playOrPauseInstruments);
 
-    useEffect(() => {
+    useEffect(()=>{
         savedPlayOrPauseInstruments.current = playOrPauseInstruments;
-        savedTimeIntervalCallback.current = timeIntervalCallback;
-    }, [playOrPauseInstruments, timeIntervalCallback, callback])
+    }, [allInstrumentsStates, playOrPauseInstruments])
 
     useEffect(() => {
         savedPlayOrPauseInstruments.current(isLoopPlaying);
     }, [isLoopPlaying]);
 
     const timeOutDelay: number = 8000;
-    useInterval({callback:savedTimeIntervalCallback.current, delay: isLoopPlaying ? timeOutDelay : null});
+    useInterval({callback:timeIntervalCallback, delay: isLoopPlaying ? timeOutDelay : null});
 };
 
 export default usePlayLoop;

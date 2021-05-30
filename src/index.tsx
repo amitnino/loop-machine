@@ -8,7 +8,7 @@ import { LoopStateProvider } from './providers/LoopStateProvider';
 ReactDOM.render(
   <React.StrictMode>
     <LoopStateProvider>
-      <App />
+        <App />
     </LoopStateProvider>
   </React.StrictMode>,
   document.getElementById('root')
